@@ -1,0 +1,237 @@
+<div class="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
+  
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 bg-stone-950/85 border-b border-stone-800/80 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo & Sentinel Name -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-0.5 shadow-lg shadow-emerald-950/60 flex items-center justify-center">
+          <div class="w-full h-full bg-stone-950 rounded-[14px] flex items-center justify-center">
+            <mat-icon class="text-emerald-400 text-xl">bolt</mat-icon>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-black tracking-tight bg-gradient-to-r from-stone-100 via-stone-200 to-emerald-300 bg-clip-text text-transparent">
+              LuzEmDia
+            </h1>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold tracking-wider uppercase">
+              Sentinel
+            </span>
+          </div>
+          <p class="text-[11px] text-stone-400 truncate max-w-[200px] sm:max-w-none">
+            Gestão Preditiva do Ciclo de 30 Dias • ENDE Angola
+          </p>
+        </div>
+      </div>
+
+      <!-- Center / Right Live Status Pills -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- EMIS Status Pill -->
+        <div class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-[11px] text-stone-300 font-mono">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+          <span>EMIS MCX:</span>
+          <strong class="text-emerald-400">Ativo</strong>
+        </div>
+
+        <!-- WhatsApp Sentinel Pill -->
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-[11px] text-stone-300 font-mono">
+          <span class="w-2 h-2 rounded-full" [class.bg-emerald-500]="isWaConnected()" [class.bg-stone-500]="!isWaConnected()"></span>
+          <span>WhatsApp:</span>
+          <strong [class.text-emerald-400]="isWaConnected()" [class.text-stone-400]="!isWaConnected()">
+            {{ isWaConnected() ? 'Vigiando' : 'Pausa' }}
+          </strong>
+        </div>
+
+        <!-- Fast 1-Tap Payment CTA if not paid -->
+        @if (!cycle().isPaid) {
+          <button
+            (click)="triggerFastPayment()"
+            class="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-950 transition-all cursor-pointer"
+          >
+            <mat-icon class="text-xs">touch_app</mat-icon>
+            <span>Pagar via MCX</span>
+          </button>
+        }
+
+        <!-- Settings Button -->
+        <button
+          (click)="openSettings()"
+          class="w-9 h-9 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+          title="Configurações e Dados Locais"
+        >
+          <mat-icon class="text-sm">settings</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs Bar -->
+    <div class="border-t border-stone-800/80 bg-stone-950/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex items-center gap-1 overflow-x-auto py-2 no-scrollbar text-xs">
+          <button
+            (click)="setActiveTab('overview')"
+            class="px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer"
+            [class.bg-stone-800]="activeTab() === 'overview'"
+            [class.text-emerald-400]="activeTab() === 'overview'"
+            [class.text-stone-400]="activeTab() !== 'overview'"
+            [class.hover:text-stone-200]="activeTab() !== 'overview'"
+          >
+            <mat-icon class="text-sm">dashboard</mat-icon>
+            <span>Ciclo & Painel</span>
+          </button>
+
+          <button
+            (click)="setActiveTab('whatsapp')"
+            class="px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer relative"
+            [class.bg-stone-800]="activeTab() === 'whatsapp'"
+            [class.text-emerald-400]="activeTab() === 'whatsapp'"
+            [class.text-stone-400]="activeTab() !== 'whatsapp'"
+            [class.hover:text-stone-200]="activeTab() !== 'whatsapp'"
+          >
+            <mat-icon class="text-sm">chat</mat-icon>
+            <span>WhatsApp Sentinel</span>
+            @if (isWaConnected()) {
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            }
+          </button>
+
+          <button
+            (click)="setActiveTab('vault')"
+            class="px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer"
+            [class.bg-stone-800]="activeTab() === 'vault'"
+            [class.text-emerald-400]="activeTab() === 'vault'"
+            [class.text-stone-400]="activeTab() !== 'vault'"
+            [class.hover:text-stone-200]="activeTab() !== 'vault'"
+          >
+            <mat-icon class="text-sm">verified_user</mat-icon>
+            <span>Cofre Anti-Fiscal</span>
+          </button>
+
+          <button
+            (click)="setActiveTab('ocr')"
+            class="px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer"
+            [class.bg-stone-800]="activeTab() === 'ocr'"
+            [class.text-emerald-400]="activeTab() === 'ocr'"
+            [class.text-stone-400]="activeTab() !== 'ocr'"
+            [class.hover:text-stone-200]="activeTab() !== 'ocr'"
+          >
+            <mat-icon class="text-sm">document_scanner</mat-icon>
+            <span>Digitalizar Fatura (OCR)</span>
+          </button>
+
+          <button
+            (click)="setActiveTab('forecast')"
+            class="px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer"
+            [class.bg-stone-800]="activeTab() === 'forecast'"
+            [class.text-emerald-400]="activeTab() === 'forecast'"
+            [class.text-stone-400]="activeTab() !== 'forecast'"
+            [class.hover:text-stone-200]="activeTab() !== 'forecast'"
+          >
+            <mat-icon class="text-sm">auto_graph</mat-icon>
+            <span>Previsão IA Angola</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-8">
+    
+    <!-- Tab 1: Overview (Hero Radial Dial & Realtime Sentinel Engine) -->
+    @if (activeTab() === 'overview') {
+      <div class="space-y-8 animate-fade-in">
+        <!-- Main Dial Section -->
+        <app-cycle-dial></app-cycle-dial>
+
+        <!-- Secondary Dual Columns: WhatsApp preview + Anti-Fiscal snippet -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div class="lg:col-span-6">
+            <div class="flex items-center justify-between mb-3 px-1">
+              <h3 class="text-sm font-bold text-stone-200 flex items-center gap-2">
+                <mat-icon class="text-emerald-400 text-base">chat</mat-icon>
+                <span>Canal do Sentinel no WhatsApp</span>
+              </h3>
+              <button
+                (click)="setActiveTab('whatsapp')"
+                class="text-xs text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1 cursor-pointer"
+              >
+                <span>Abrir Completo</span>
+                <mat-icon class="text-xs">chevron_right</mat-icon>
+              </button>
+            </div>
+            <app-whatsapp-sentinel></app-whatsapp-sentinel>
+          </div>
+
+          <div class="lg:col-span-6 space-y-6">
+            <!-- Quick Previsão IA Card -->
+            <app-ai-forecast></app-ai-forecast>
+
+            <!-- Quick Vault Preview -->
+            <app-anti-fiscal-vault></app-anti-fiscal-vault>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Tab 2: WhatsApp Sentinel Full View -->
+    @if (activeTab() === 'whatsapp') {
+      <div class="max-w-4xl mx-auto space-y-6 animate-fade-in">
+        <div class="text-center space-y-1">
+          <h2 class="text-2xl font-bold text-stone-100">Sentinela Conversacional de Eletricidade</h2>
+          <p class="text-xs text-stone-400">
+            Comunicação direta por WhatsApp local sem necessidade de assinaturas pagas. Receba lembretes proativos e autorize pagamentos em segundos.
+          </p>
+        </div>
+        <app-whatsapp-sentinel></app-whatsapp-sentinel>
+      </div>
+    }
+
+    <!-- Tab 3: Anti-Fiscal Vault Full View -->
+    @if (activeTab() === 'vault') {
+      <div class="space-y-6 animate-fade-in">
+        <app-anti-fiscal-vault></app-anti-fiscal-vault>
+      </div>
+    }
+
+    <!-- Tab 4: OCR Scanner Full View -->
+    @if (activeTab() === 'ocr') {
+      <div class="space-y-6 animate-fade-in">
+        <app-ocr-scanner></app-ocr-scanner>
+      </div>
+    }
+
+    <!-- Tab 5: AI Forecast Full View -->
+    @if (activeTab() === 'forecast') {
+      <div class="space-y-6 animate-fade-in">
+        <app-ai-forecast></app-ai-forecast>
+      </div>
+    }
+
+  </main>
+
+  <!-- Photorealistic Multicaixa Express Mobile Push Modal -->
+  <app-emis-modal></app-emis-modal>
+
+  <!-- Settings & Backup Modal -->
+  <app-settings-modal #settingsModal></app-settings-modal>
+
+  <!-- Elegant Compact Footer -->
+  <footer class="border-t border-stone-800/80 bg-stone-950 py-6 text-stone-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <mat-icon class="text-emerald-400 text-sm">shield</mat-icon>
+        <span><strong>LuzEmDia</strong> • Sentinel de Energia e Dívida Zero</span>
+      </div>
+      <div class="flex items-center gap-4 text-stone-400 text-[11px]">
+        <span>🇦🇴 Angola (ENDE EP)</span>
+        <span>•</span>
+        <span>Gateway EMIS GPO Simulado</span>
+        <span>•</span>
+        <span>Dados 100% Locais</span>
+      </div>
+    </div>
+  </footer>
+</div>

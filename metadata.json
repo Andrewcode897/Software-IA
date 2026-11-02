@@ -1,0 +1,6 @@
+{
+  "name": "LuzEmDia — Personal Energy & Debt Sentinel",
+  "description": "Automatização inteligente do ciclo de 30 dias de faturas de eletricidade ENDE em Angola, com alertas preditivos via WhatsApp, simulação EMIS Multicaixa Express e Cofre Digital Anti-Fiscal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
